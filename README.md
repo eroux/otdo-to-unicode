@@ -1,4 +1,4 @@
-# OTDOS to unicode
+# OTDOTS to unicode
 
 This repository contains Javascript code to convert files transliterated from the OTDO transliteration scheme (reffered to as OTDOTS). 
 
