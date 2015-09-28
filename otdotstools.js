@@ -3,13 +3,13 @@ var hashTibExWylie = {
 	"": "",
 	"k": "ཀ", "kh": "ཁ", "g": "ག", "gh": "གྷ", "ng": "ང",
 	"c": "ཅ", "ch": "ཆ", "j": "ཇ", "ny": "ཉ",
-	"T": "ཏཊ", "TH": "ཐཋ", "D": "དཌ", "DH": "དྷཌྷ", "N": "ནཎ",
+	"T": "ཊ", "TH": "ཋ", "D": "ཌ", "DH": "ཌྷ", "N": "ཎ",
 	"t": "ཏ", "th": "ཐ", "d": "ད", "dh": "དྷ", "n": "ན",
 	"p": "པ", "ph": "ཕ", "b": "བ", "bh": "བྷ", "m": "མ",
 	"ts": "ཙ", "tsh": "ཚ", "dz": "ཛ", "dzh": "ཛྷ", "w": "ཝ", "v": "ཝ",
 	"zh": "ཞ", "z": "ཟ", "'": "འ", "y": "ཡ",
-	"r": "ར", "l": "ལ", "sh": "ཤ", "SH": "ཤཥ", "s": "ས",
-	"h": "ཧ", "_a": "ཨ",
+	"r": "ར", "l": "ལ", "sh": "ཤ", "SH": "ཥ", "s": "ས",
+	"h": "ཧ", "_a": "ཨ", "^": "ཨ",
 	"_aa": "ཨཱ", "_i": "ཨི", "_ii": "ཨཱི", "_I": "ཨྀ", "_u": "ཨུ", "_uu": "ཨཱུ",
 	"_.r": "ཨྲྀ", "_.r.r": "ཨྲཱྀ", "_.l": "ཨླྀ", "_.l.l": "ཨླཱྀ",
 	"_e": "ཨེ", "_ai": "ཨཻ","_o": "ཨོ", "_au": "ཨཽ",
@@ -31,6 +31,7 @@ var hashTibExWylie = {
 function otdotsToUnicode(str) {
 	var result = "";
 	var flag = true;// ?
+	var justsawplus = false;
 	str += "\0\0\0";
 	var ch;
 	var cha = "";// prefix
@@ -68,6 +69,9 @@ function otdotsToUnicode(str) {
 					ch = "";
 					flag = true;
 				}
+				break;
+			case "+":
+				justsawplus = true;
 				break;
 			case "'":
 				if (str[i + 1] == "'") {
@@ -373,10 +377,22 @@ function otdotsToUnicode(str) {
 				}
 				break;
 		}
-		if (flag) {
+		if (justsawplus) {
+			if (str[i + 1]) {
+				if (chf !== "") {
+					chf = chf+hashTibExWylie['_'+str[i+1]];
+				}
+				else {
+					chd = chd+str[i+1];
+				}
+				i++;
+			}
+			justsawplus = false;
+		}
+		else if (flag) {
 			if (chc) {
-				result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[chc] +
-				          subscriptsToUni(chd) + hashTibExWylie[che] + "་";
+				result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[(chb === "" ? "" : "_")+chc] +
+				          subscriptsToUni(chd) + hashTibExWylie[che] + chf + "་";
 				cha = chb = chc = chd = che = chf = "";
 			}
 			else {
@@ -389,8 +405,13 @@ function otdotsToUnicode(str) {
 					chc = "_a";
 					che = ch.slice(1);
 				}
-				else if (hashTibExWylie[ch] >= "཰" && hashTibExWylie[ch] <= "ཱྀ") {
-					che = ch;
+				else if (ch == "a" || ch == "aa" || (hashTibExWylie[ch] >= "཰" && hashTibExWylie[ch] <= "ཱྀ")) {
+					if (chf === "") {
+						che = ch;
+					}
+					else {
+						chf += hashTibExWylie[ch];
+					}
 				}
 				else if (chc === "") {
 					chc = ch;
@@ -433,8 +454,8 @@ function otdotsToUnicode(str) {
 	}
 	if (!flag) {
 		if (chc) {
-			result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[chc] +
-			          subscriptsToUni(chd) + hashTibExWylie[che] + "་";
+			result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[(chb === "" ? "" : "_")+chc] +
+			          subscriptsToUni(chd) + hashTibExWylie[che] + chf + "་";
 		}
 		else {
 			result += (typeof hashTibExWylie[ch] !== 'undefined' ? hashTibExWylie[ch] : ch);
