@@ -2,7 +2,7 @@
 var hashTibExWylie = {
 	"": "",
 	"k": "ཀ", "kh": "ཁ", "g": "ག", "gh": "གྷ", "ng": "ང",
-	"c": "ཅ", "ch": "ཆ", "j": "ཇ", "jh": "཈", "ny": "ཉ",
+	"c": "ཅ", "ch": "ཆ", "j": "ཇ", "ny": "ཉ",
 	"T": "ཏཊ", "TH": "ཐཋ", "D": "དཌ", "DH": "དྷཌྷ", "N": "ནཎ",
 	"t": "ཏ", "th": "ཐ", "d": "ད", "dh": "དྷ", "n": "ན",
 	"p": "པ", "ph": "ཕ", "b": "བ", "bh": "བྷ", "m": "མ",
@@ -14,7 +14,7 @@ var hashTibExWylie = {
 	"_.r": "ཨྲྀ", "_.r.r": "ཨྲཱྀ", "_.l": "ཨླྀ", "_.l.l": "ཨླཱྀ",
 	"_e": "ཨེ", "_ai": "ཨཻ","_o": "ཨོ", "_au": "ཨཽ",
 	"_k": "ྐ", "_kh": "ྑ", "_g": "ྒ", "_gh": "ྒྷ", "_ng": "ྔ",
-	"_c": "ྕ", "_ch": "ྖ", "_j": "ྗ", "_jh": "྘", "_ny": "ྙ",
+	"_c": "ྕ", "_ch": "ྖ", "_j": "ྗ", "_ny": "ྙ",
 	"_T": "ྚ", "_TH": "ྛ", "_D": "ྜ", "_DH": "ྜྷ", "_N": "ྞ",
 	"_t": "ྟ", "_th": "ྠ", "_d": "ྡ", "_dh": "ྡྷ", "_n": "ྣ",
 	"_p": "ྤ", "_ph": "ྥ", "_b": "ྦ", "_bh": "ྦྷ", "_m": "ྨ",
@@ -30,7 +30,7 @@ var hashTibExWylie = {
 }// "k.sa": "ཀྵ"
 function deTibExWylie(str) {
 	var result = "";
-	var flag = true;// 語頭
+	var flag = true;// prefix
 	str += "\0\0\0";
 	var ch;
 	var cha = "";// 前
@@ -38,7 +38,7 @@ function deTibExWylie(str) {
 	var chc = "";// 基
 	var chd = "";// 足
 	var che = "";// 母
-	var chf = "";// 後・再後
+	var chf = "";// 後・再後 suffix, second suffix
 // 基0母2後再
 // 基1足母2後再
 // 基2前0母2後再
@@ -191,10 +191,6 @@ function deTibExWylie(str) {
 						ch = ".g";
 						i++;
 					}
-					else if (str[i + 1] == "j") {
-						ch = ".j";
-						i++;
-					}
 					else if (str[i + 1] == "t") {
 						if (str[i + 2] == "h") {
 							ch = "TH";
@@ -271,10 +267,6 @@ function deTibExWylie(str) {
 				flag = false;
 				break;
 			case "j":
-				if (str[i + 1] == "H" || str[i + 1] == "h") {
-					ch = "jh";
-					i++;
-				}
 				flag = false;
 				break;
 			case "T":
