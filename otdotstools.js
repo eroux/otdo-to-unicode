@@ -22,15 +22,15 @@ var hashTibExWylie = {
 	"_zh": "ྮ", "_z": "ྯ", "_'": "ྰ", "_y": "ྱ",
 	"_r": "ྲ", "_l": "ླ", "_sh": "ྴ", "_SH": "ྵ", "_s": "ྶ",
 	"_h": "ྷ", "__a": "ྸ",
-	"a": "཰", "aa": "཰2་ཱ", "i": "ི", "ii": "ི2་ཱི", "I": "ྀ", "u": "ུ", "uu": "ུ2་ཱུ",
+	"a": "", "aa": "2་ཱ", "i": "ི", "ii": "ི2་ཱི", "I": "ྀ", "u": "ུ", "uu": "ུ2་ཱུ",
 	".r": "ྲྀ", ".r.r": "ྲྀ2་ྲཱྀ", ".l": "ླྀ", ".l.l": "ླྀ2་ླཱྀ",
 	"e": "ེ", "ai": "ེ2་ཻ","o": "ོ", "au": "ོ2་ཽ",
 	"M": "ཾ", ":": "ཿ",
 	"_": "྄", "tsheg": "་", "/": "།", "//": "༎", " ": " "
 };// "k.sa": "ཀྵ"
-function deTibExWylie(str) {
+function otdotsToUnicode(str) {
 	var result = "";
-	var flag = true;// prefix
+	var flag = true;// ?
 	str += "\0\0\0";
 	var ch;
 	var cha = "";// prefix
@@ -50,14 +50,13 @@ function deTibExWylie(str) {
 		console.log('che: '+che);
 		console.log('chf: '+chf);
 	}
-// 基0母2後再
-// 基1足母2後再
-// 基2前0母2後再
-// 基2前1足母2後再
-// 基3頭0母2後再
-// 基3頭1足母2後再
-// 基4頭2前0母2後再
-// 基c4頭b2前a1足d母e2後再
+	function subscriptsToUni(chd) {
+		var res = "";
+		for (var i = 0; i < chd.length; i++) {
+			res+=hashTibExWylie['_'+chd[i]]
+		}
+		return res;
+	}
 	for (var i = 0; i < str.length - 3; i++) {
 		ch = str[i];
 		switch (ch) {
@@ -163,13 +162,6 @@ function deTibExWylie(str) {
 				else ch = (flag ? "_o" : "o");
 				flag = false;
 				break;
-			//case "r":
-			//	if (str[i + 1] == "I") {
-			//		ch = ".r";
-			//		i++;
-			//	}
-			//	flag = false;
-			//	break;
 			case ".":
 				if (str[i + 1] == "r") {
 					if (str[i + 2] == "." && str[i + 3] == "r") {
@@ -366,10 +358,6 @@ function deTibExWylie(str) {
 			case "H":
 				ch = ":";
 				break;
-			// case "-":
-			// 	ch = "";
-			// 	cha = chc;
-			// 	break;
 			case "/":
 				if (str[i + 1] == "/") {
 					ch = "//";
@@ -387,11 +375,8 @@ function deTibExWylie(str) {
 		}
 		if (flag) {
 			if (chc) {
-				result += hashTibExWylie[chc] +
-					(chb ? (cha ? "4" : "3") : "") + hashTibExWylie[chb] +
-					(cha ? "2" : "") + hashTibExWylie[cha] +
-					(chd ? "1" : "0") + hashTibExWylie[chd] +
-					hashTibExWylie[che] + "2" + chf + "་";
+				result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[chc] +
+				          subscriptsToUni(chd) + hashTibExWylie[che] + "་";
 				cha = chb = chc = chd = che = chf = "";
 			}
 			else {
@@ -425,8 +410,8 @@ function deTibExWylie(str) {
 						chc = ch;
 					}
 				}
-				else if (ch == "v" || ch == "w" || ch == "y" || ch == "r" || ch == "l" || ch == "'") {
-					chd = ch;
+				else if ((ch == "v" || ch == "w") || (chd == "" && (ch == "y" || ch == "r" || ch == "l" || ch == "'"))) {
+					chd += ch;
 				}
 				else if (chc == "r" || chc == "l" || chc == "s") {
 					chb = chc;
@@ -448,64 +433,15 @@ function deTibExWylie(str) {
 	}
 	if (!flag) {
 		if (chc) {
-			result += hashTibExWylie[chc] +
-				(chb ? (cha ? "4" : "3") : "") + hashTibExWylie[chb] +
-				(cha ? "2" : "") + hashTibExWylie[cha] +
-				(chd ? "1" : "0") + hashTibExWylie[chd] +
-				hashTibExWylie[che] + "2" + chf + "་";
+			result += hashTibExWylie[cha] + hashTibExWylie[chb] + hashTibExWylie[chc] +
+			          subscriptsToUni(chd) + hashTibExWylie[che] + "་";
 		}
 		else {
 			result += (typeof hashTibExWylie[ch] !== 'undefined' ? hashTibExWylie[ch] : ch);
 		}
-
 	}
-	return result;
+	return result.replace(/།་/g, "། ").replace(/༎་/g, "༎ ");
 }
-function enTib(str) {
-	return str.replace(/([ཀ-࿿][0-9ཀ-࿿]*)/g, function(whole, s) {
-		if (s.match(/^(.)4(.)2(.)1(.)(.*?)2(.*)$/)) {
-			return RegExp.$3 + RegExp.$2 + String.fromCharCode(RegExp.$1.charCodeAt(0) + 0x0050) +
-				String.fromCharCode(RegExp.$4.charCodeAt(0) + 0x0050) + RegExp.$5 + RegExp.$6;
-		}
-		else if (s.match(/^(.)4(.)2(.)0(.*?)2(.*)$/)) {
-			return RegExp.$3 + RegExp.$2 + String.fromCharCode(RegExp.$1.charCodeAt(0) + 0x0050) +
-				RegExp.$4 + RegExp.$5;
-		}
-		else if (s.match(/^(.)3(.)1(.)(.*?)2(.*)$/)) {
-			return RegExp.$2 + String.fromCharCode(RegExp.$1.charCodeAt(0) + 0x0050) +
-				String.fromCharCode(RegExp.$3.charCodeAt(0) + 0x0050) + RegExp.$4 + RegExp.$5;
-		}
-		else if (s.match(/^(.)3(.)0(.*?)2(.*)$/)) {
-			return RegExp.$2 + String.fromCharCode(RegExp.$1.charCodeAt(0) + 0x0050) +
-				RegExp.$3 + RegExp.$4;
-		}
-		else if (s.match(/^(.)2(.)1(.)(.*?)2(.*)$/)) {
-			return RegExp.$2 + RegExp.$1 +
-				String.fromCharCode(RegExp.$3.charCodeAt(0) + 0x0050) + RegExp.$4 + RegExp.$5;
-		}
-		else if (s.match(/^(.)2(.)0(.*?)2(.*)$/)) {
-			return RegExp.$2 + RegExp.$1 + RegExp.$3 + RegExp.$4;
-		}
-		else if (s.match(/^(.)1(.)(.*?)2(.*)$/)) {
-			return RegExp.$1 + String.fromCharCode(RegExp.$2.charCodeAt(0) + 0x0050) +
-				RegExp.$3 + RegExp.$4;
-		}
-		else if (s.match(/^(.)0(.*?)2(.*)$/)) {
-			return RegExp.$1 + RegExp.$2 + RegExp.$3;
-		}
-		else {
-			return s.replace(/[0-9]/g, '');
-		}
-	})
-	.replace(/཰/g, "").replace(/།་/g, "། ").replace(/༎་/g, "༎ ");
-}
-function strForTibComp(str) {
-	return str.slice(0, -1);
-}
-
-function otdotsToUnicode(str) {
-	return enTib(deTibExWylie(str));
-};
 
 if (typeof exports !== 'undefined') {
    exports.otdotsToUnicode = otdotsToUnicode;
