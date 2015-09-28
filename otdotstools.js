@@ -33,12 +33,23 @@ function deTibExWylie(str) {
 	var flag = true;// prefix
 	str += "\0\0\0";
 	var ch;
-	var cha = "";// 前
-	var chb = "";// 頭
-	var chc = "";// 基
-	var chd = "";// 足
-	var che = "";// 母
-	var chf = "";// 後・再後 suffix, second suffix
+	var cha = "";// prefix
+	var chb = "";// supersript
+	var chc = "";// main
+	var chd = "";// subscript
+	var che = "";// vowel
+	var chf = "";// suffixes
+	function debugStatus() {
+		console.log('debugging:');
+		console.log('flag: '+flag);
+		console.log('ch: '+ch);
+		console.log('cha: '+cha);
+		console.log('chb: '+chb);
+		console.log('chc: '+chc);
+		console.log('chd: '+chd);
+		console.log('che: '+che);
+		console.log('chf: '+chf);
+	}
 // 基0母2後再
 // 基1足母2後再
 // 基2前0母2後再
@@ -400,20 +411,18 @@ function deTibExWylie(str) {
 					chc = ch;
 				}
 				else if (chc == "g" || chc == "d" || chc == "b" || chc == "m" || chc == "'") {
-					if (ch == "w" || ch == "v" || ch == "y" || ch == "r" || ch == "l") {
+					if (ch == "w" || ch == "v" || ch == "y" || ch == "r" || (ch == "l" && chd == "")) {
 						chd = ch;
 					}
+					else if (chd == "r" || chd == "l") {
+						cha = chc;
+						chb = chd;
+						chc = ch;
+						chd = "";
+					}
 					else {
-						if (chd == "r" || chd == "l") {
-							cha = chc;
-							chb = chd;
-							chc = ch;
-							chd = "";
-						}
-						else {
-							cha = chc;
-							chc = ch;
-						}
+						cha = chc;
+						chc = ch;
 					}
 				}
 				else if (ch == "v" || ch == "w" || ch == "y" || ch == "r" || ch == "l" || ch == "'") {
@@ -435,6 +444,7 @@ function deTibExWylie(str) {
 				chf += (typeof hashTibExWylie[ch] !== 'undefined' ? hashTibExWylie[ch] : ch);
 			}
 		}
+		//debugStatus();
 	}
 	if (!flag) {
 		if (chc) {
