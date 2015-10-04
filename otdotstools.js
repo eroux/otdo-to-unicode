@@ -24,7 +24,7 @@ var hashTibExWylie = {
 	'a': '', 'aa': '\u0F71', 'i': '\u0F72', 'ii': '\u0F71\u0F72', 'I': '\u0F80', 'u': '\u0F74', 'uu': '\u0F71\u0F74',
 	'.r': '\u0F76', '.r.r': '\u0FB2\u0F71\u0F80', '.l': '\u0F78', '.l.l': '\u0FB3\u0F71\u0F80',
 	'e': '\u0F7A', 'ai': '\u0F7B','o': '\u0F7C', 'au': '\u0F7D',
-	'M': '\u0F7E', ':': '\u0F7F',
+	'~M': '\u0F83', 'M': '\u0F7E', ':': '\u0F7F',
 	'_': '\u0F84', 'tsheg': '\u0F0B', '/': '\u0F0D', '//': '\u0F0E', ' ': ' '
 };// "k.sa": "\u0F69"
 function otdotsToUnicode(str) {
@@ -142,6 +142,13 @@ function otdotsToUnicode(str) {
 					i++;
 				}
 				else ch = (flag ? "_u" : "u");
+				flag = false;
+				break;
+			case "~":
+				if (str[i + 1] == "M") {
+					ch = "~M";
+					i++;
+				}
 				flag = false;
 				break;
 			case "U":
